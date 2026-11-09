@@ -1,0 +1,213 @@
+# Cognitive GPS System - Setup Guide
+
+## Quick Setup Script for New Systems
+
+### Step 1: Install Prerequisites
+
+Run these commands in **PowerShell (Admin)**:
+
+```powershell
+# Install Java JDK 21
+winget install -e --id Oracle.JDK.21 --accept-package-agreements --accept-source-agreements
+
+# Install Node.js
+winget install -e --id OpenJS.NodeJS --accept-package-agreements --accept-source-agreements
+
+# Install MongoDB
+winget install -e --id MongoDB.Server --accept-package-agreements --accept-source-agreements
+```
+
+### Step 2: Download and Extract Maven
+
+1. Download: https://archive.apache.org/dist/maven/binaries/apache-maven-3.9.9-bin.zip
+2. Extract to: `C:\tools\maven`
+3. Create folder: `C:\tools\maven`
+
+### Step 3: Environment Variables
+
+Add these to Windows **System Environment Variables**:
+
+```
+Variable Name: JAVA_HOME
+Value: C:\Program Files\Java\jdk-21
+
+Variable Name: MAVEN_HOME
+Value: C:\tools\maven\apache-maven-3.9.9
+
+Variable Name: MONGODB_HOME
+Value: C:\Program Files\MongoDB\Server\8.3
+
+Edit PATH and add:
+%JAVA_HOME%\bin
+%MAVEN_HOME%\bin
+%MONGODB_HOME%\bin
+```
+
+### Step 4: Create MongoDB Data Directory
+
+```powershell
+mkdir C:\data\db
+```
+
+---
+
+## Running the Project
+
+### Terminal 1: Start MongoDB
+
+```powershell
+"C:\Program Files\MongoDB\Server\8.3\bin\mongod.exe" --dbpath "C:\data\db" --port 27017
+```
+
+Keep this terminal open.
+
+### Terminal 2: Start Backend
+
+```powershell
+cd "C:\path\to\GPS Tracker\backend"
+mvn clean spring-boot:run
+```
+
+Wait until you see: `Started CognitiveGpsApplication`
+
+### Terminal 3: Start Frontend
+
+```powershell
+cd "C:\path\to\GPS Tracker\frontend"
+npm install
+npm run dev
+```
+
+---
+
+## Access the Application
+
+| Service | URL |
+|---------|-----|
+| Frontend | http://localhost:5173 |
+| Backend API | http://localhost:8080 |
+
+---
+
+## Test API Endpoints
+
+```bash
+# Test location history
+curl "http://localhost:8080/api/history?userId=test"
+
+# Send location
+curl -X POST "http://localhost:8080/api/location" ^
+  -H "Content-Type: application/json" ^
+  -d "{\"userId\":\"test\",\"latitude\":40.7128,\"longitude\":-74.0060,\"speed\":10}"
+
+# Get prediction
+curl "http://localhost:8080/api/predict?userId=test"
+
+# Get explanation
+curl "http://localhost:8080/api/explain?userId=test"
+
+# Get alerts
+curl "http://localhost:8080/api/alerts?userId=test"
+
+# Simulate future
+curl "http://localhost:8080/api/simulate?userId=test&hours=2"
+
+# Chat
+curl -X POST "http://localhost:8080/api/chat" ^
+  -H "Content-Type: application/json" ^
+  -d "{\"userId\":\"test\",\"message\":\"Where am I going?\"}"
+```
+
+---
+
+## Troubleshooting
+
+### "mvn command not found"
+```powershell
+set PATH=%PATH%;C:\tools\maven\apache-maven-3.9.9\bin
+```
+
+### "java command not found"
+```powershell
+set PATH=%PATH%;C:\Program Files\Java\jdk-21\bin
+```
+
+### MongoDB connection failed
+```powershell
+# Check if MongoDB is running
+netstat | findstr 27017
+
+# Start MongoDB manually
+"C:\Program Files\MongoDB\Server\8.3\bin\mongod.exe" --dbpath "C:\data\db"
+```
+
+### Port 8080 already in use
+```powershell
+# Find and kill the process using port 8080
+netstat -ano | findstr :8080
+taskkill /PID <process_id> /F
+```
+
+### Port 5173 already in use
+Vite will automatically use 5174. Check the terminal output.
+
+---
+
+## Software Versions Used
+
+| Software | Version | Location |
+|----------|---------|----------|
+| Java JDK | 21.0.10 | `C:\Program Files\Java\jdk-21` |
+| Maven | 3.9.9 | `C:\tools\maven\apache-maven-3.9.9` |
+| MongoDB | 8.3 | `C:\Program Files\MongoDB\Server\8.3` |
+| Node.js | 18+ | `C:\Program Files\nodejs` |
+
+---
+
+## Project Structure
+
+```
+GPS Tracker/
+├── backend/                    # Spring Boot Backend
+│   ├── pom.xml
+│   └── src/main/
+│       ├── java/com/cognitivegps/
+│       │   ├── config/         # WebSocket, CORS config
+│       │   ├── controller/     # REST endpoints
+│       │   ├── dto/            # Request/Response DTOs
+│       │   ├── model/          # MongoDB documents
+│       │   ├── repository/     # Data repositories
+│       │   └── service/        # Business logic
+│       └── resources/
+│           └── application.properties
+│
+├── frontend/                   # Vue.js Frontend
+│   ├── package.json
+│   ├── vite.config.js
+│   └── src/
+│       ├── components/         # Map, Chat components
+│       ├── views/             # Dashboard
+│       ├── services/          # API calls
+│       └── router/            # Routes
+│
+├── SETUP.md                   # This file
+└── README.md                  # Full documentation
+```
+
+---
+
+## Quick Commands Reference
+
+```powershell
+# === TERMINAL 1: MongoDB ===
+"C:\Program Files\MongoDB\Server\8.3\bin\mongod.exe" --dbpath "C:\data\db" --port 27017
+
+# === TERMINAL 2: Backend ===
+cd "C:\path\to\GPS Tracker\backend"
+mvn clean spring-boot:run
+
+# === TERMINAL 3: Frontend ===
+cd "C:\path\to\GPS Tracker\frontend"
+npm install
+npm run dev
+```
