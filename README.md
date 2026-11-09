@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 # Autonomous Cognitive GPS System
 
 **An intelligent GPS-based system with predictive intelligence, explainable decision engine, and adaptive behavior modeling.**
@@ -177,3 +178,6 @@ npm run dev
 ## License
 
 MIT License - Academic/Free Use
+=======
+# GPS-TRACKER
+>>>>>>> b39fa1a325a5b6e78d8ab43180337e57367f2381
